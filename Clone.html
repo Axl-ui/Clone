@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Clone</title>
+  <style>
+    /* Global reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Importing the Roboto font (YouTube's font) */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif; /* Changed to Roboto font */
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5em 2em;
+      background-color: #202020;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 2.4em; /* Adjusted size for logo */
+      font-weight: 700; /* YouTube's font weight for logo */
+      color: #FF0000;
+      cursor: pointer;
+    }
+
+    .logo img {
+      height: 30px;
+      margin-right: 10px;
+    }
+
+    /* YouTube Search Bar */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      max-width: 800px;
+      position: relative;
+    }
+
+    /* Search Bar Input */
+    .search-bar input {
+      width: 100%;
+      padding: 10px 20px;
+      border-radius: 24px;
+      border: 1px solid #ccc;
+      font-size: 16px; /* Adjusted font size */
+      outline: none;
+      background-color: #fff;
+    }
+
+    .search-bar input:focus {
+      border-color: #FF0000;
+      box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    }
+
+    /* Search Icon */
+    .search-bar button {
+      position: absolute;
+      right: 10px; /* Place it inside the input */
+      background: none;
+      border: none;
+      color: #606060;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Mic Icon (outside the search bar) */
+    .mic-button {
+      background: none;
+      border: none;
+      color: #606060;
+      font-size: 20px;
+      cursor: pointer;
+      margin-left: 8px; /* Close the distance */
+    }
+
+    /* Header Icons Section */
+    .header-icons {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .header-icons button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      margin-left: 20px;
+      cursor: pointer;
+    }
+
+    .header-icons button:hover {
+      color: #FF0000;
+    }
+
+    /* Main Content Layout */
+    .main-content {
+      display: flex;
+      width: 100%;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar Section */
+    .sidebar {
+      width: 240px;
+      background-color: #181818;
+      color: white;
+      position: fixed;
+      top: 60px; /* Adjusted top margin to create space from header */
+      height: calc(100vh - 60px); /* Adjusted height to fit below the header */
+      padding: 1.5em;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .sidebar li {
+      display: flex;
+      align-items: center;
+      margin: 1em 0;
+      font-size: 1.2em; /* Adjusted font size */
+      cursor: pointer;
+      padding: 0.8em;
+      border-radius: 5px;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    .sidebar li:hover {
+      background-color: #FF0000;
+      color: white;
+    }
+
+    .sidebar li i {
+      margin-right: 15px;
+    }
+
+    .sidebar .divider {
+      margin: 1.5em 0;
+      border-bottom: 1px solid #333;
+    }
+
+    /* Video Grid Section */
+    .content-wrapper {
+      margin-left: 240px;
+      padding: 2em;
+      width: 100%;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      height: 100vh;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5em;
+      padding: 2em;
+      width: 100%;
+    }
+
+    .video {
+      background-color: white;
+      padding: 1em;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .video:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .thumbnail {
+      background-color: #ccc;
+      width: 100%;
+      height: 150px;
+      border-radius: 10px;
+      margin-bottom: 0.8em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    h3 {
+      font-size: 1.2em; /* Adjusted title size */
+      margin-bottom: 0.5em;
+      color: #333;
+    }
+
+    p {
+      color: gray;
+      font-size: 0.9em;
+    }
+
+    /* Filter Buttons Section */
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px; /* Adds spacing between filters and videos */
+      padding: 10px 0; /* Adds padding for cleaner layout */
+    }
+
+    .filter-buttons button {
+      background-color: #f1f1f1;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 15px;
+      font-size: 14px;
+      color: #606060;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .filter-buttons button:hover {
+      background-color: #e0e0e0;
+      color: #000;
+    }
+
+    .filter-buttons button.active {
+      background-color: #202020;
+      color: white;
+    }
+
+    /* Footer Section */
+    .footer {
+      text-align: center;
+      background-color: #202020;
+      color: white;
+      padding: 1.5em;
+      margin-top: 2em;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .footer a {
+      color: #FF0000;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+    .sidebar {
+      width: 180px; /* Adjust sidebar width for smaller screens */
+    }
+
+    .content-wrapper {
+      margin-left: 180px; /* Match the new sidebar width */
+    }
+
+    .video-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+  }
+  </style>
+  <!-- Link to Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="logo">
+      <img src="ftube.jpeg" alt="YouTube Logo">
+      FriendTube
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search">
+      <button><i class="fas fa-search"></i></button> <!-- Search button inside -->
+    </div>
+    <button class="mic-button"><i class="fas fa-microphone"></i></button> <!-- Mic outside -->
+    <div class="header-icons">
+      <button><i class="fas fa-bell"></i></button>
+      <button><i class="fas fa-th"></i></button>
+      <button><i class="fas fa-user-circle"></i></button>
+    </div>
+  </header>
+
+  <!-- Sidebar and Content -->
+  <div class="main-content">
+    <aside class="sidebar">
+      <!-- Top Section with Home, Shorts, Subscriptions -->
+      <ul>
+        <li><i class="fas fa-home"></i> Home</li>
+        <li><i class="fas fa-video"></i> Shorts</li>
+        <li><i class="fas fa-play-circle"></i> Subscriptions</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <!-- Explore Section -->
+      <ul>
+        <li><i class="fas fa-fire"></i> Trending</li>
+        <li><i class="fas fa-music"></i> Music</li>
+        <li><i class="fas fa-gamepad"></i> Gaming</li>
+        <li><i class="fas fa-film"></i> Movies</li>
+        <li><i class="fas fa-tv"></i> Live</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <!-- Library Section -->
+      <ul>
+        <li><i class="fas fa-bookmark"></i> Library</li>
+        <li><i class="fas fa-history"></i> History</li>
+        <li><i class="fas fa-cogs"></i> Settings</li>
+      </ul>
+    </aside>
+	
+	
+    <!-- Video Grid Section -->
+    <section class="content-wrapper">
+	<div class="filter-buttons">
+        <button class="active">All</button>
+        <button>Music</button>
+        <button>Mixes</button>
+        <button>Gaming</button>
+        <button>News</button>
+        <button>Mark TV</button>
+        <button>JC The Body Builder</button>
+        <button>Coach Saplot</button>
+        <button>Boss AhRon</button>
+        <button>Live</button>
+      </div>
+      <section class="video-grid">
+        <!-- Video 1 -->
+        <div class="video">
+          <div class="thumbnail">
+            <img src="dar.jpeg" alt="Video 1 Thumbnail">
+          </div>
+          <h3>My Travel at Darrporrt</h3>
+          <p>Mark TV</p>
+        </div>
+        <!-- Video 2 -->
+        <div class="video">
+          <div class="thumbnail">
+            <img src="bday.jpeg" alt="Video 2 Thumbnail">
+          </div>
+          <h3>My Birthday Surprise</h3>
+          <p>JC The Body Builder</p>
+        </div>
+        <!-- Video 3 -->
+        <div class="video">
+          <div class="thumbnail">
+            <img src="debut.jpeg" alt="Video 3 Thumbnail">
+          </div>
+          <h3>Serenading the Debutante</h3>
+          <p>Coach Saplot</p>
+        </div>
+        <!-- Video 4 -->
+        <div class="video">
+          <div class="thumbnail">
+            <img src="date.jpeg" alt="Video 4 Thumbnail">
+          </div>
+          <h3>Date with my friend</h3>
+          <p>Boss AhRon</p>
+        </div>
+        <!-- Video 5 -->
+        <div class="video">
+          <div class="thumbnail">
+            <img src="bf.jpeg" alt="Video 5 Thumbnail">
+          </div>
+          <h3>Best Friends Sleeping</h3>
+          <p>Mark TV</p>
+        </div>
+        <!-- Video 6 -->
+        <div class="video">
+          <div class="thumbnail">
+            <img src="love.jpeg" alt="Video 6 Thumbnail">
+          </div>
+          <h3>My Love Story</h3>
+          <p>JC The Body Builder</p>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Clone of <a href="https://www.youtube.com" target="_blank">YouTube</a></p>
+  </footer>
+</body>
+</html>
